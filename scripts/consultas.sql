@@ -119,38 +119,67 @@ WHERE
 ORDER BY
     l.titulo;
 
+--OBJETIVO: Listar o nome do funcionário que mais aplicou multas aos alunos.
+--Comandos Usados: SELECT,FROM,JOIN,HAVING,COUNT,MAX,GROUP BY,
+SELECT P.nome
+FROM Pessoa P
+JOIN Funcionario F ON P.id = F.id_funcionario
+JOIN RealizaEmprestimo E ON F.id_funcionario = E.id_funcionario
+WHERE E.valor_multa > 0
+GROUP BY P.nome
+HAVING COUNT(*) = (
+    SELECT MAX(qtd)
+    FROM (
+        SELECT COUNT(*) AS qtd
+        FROM RealizaEmprestimo
+        WHERE valor_multa > 0
+        GROUP BY id_funcionario
+    )
+);
 
+--Objetivo: encontrar a Média de empréstimos por aluno
+--Comandos Usados: SELECT,FROM,AVG,COUNT,GROUP_BY
+SELECT AVG(qtd_emprestimos) AS media_emprestimos
+FROM (
+    SELECT A.id_aluno, COUNT(*) AS qtd_emprestimos
+    FROM Aluno A 
+    JOIN RealizaEmprestimo R ON A.id_aluno = R.id_aluno
+    GROUP BY A.id_aluno
+    );
+    
+--Objetivo : encontrar a data do primeiro empréstimo realizado na biblioteca
+--Comandos Usados: SELECT,FROM, MIN
+SELECT	MIN(R.data_emprestimo)
+FROM RealizaEmprestimo R;
 
+--Livros cujo número de exemplares é maior que o número de exemplares de qualquer outro livro específico
+--Comandos usados : ANY,HAVING,COUNT,GROUP BY,SELECT,FROM
+SELECT isbn
+FROM Exemplar
+GROUP BY isbn
+HAVING COUNT(*) > ANY (
+  SELECT COUNT(*)
+  FROM Exemplar
+  WHERE isbn != '1234567890123'
+  GROUP BY isbn
+);
 
+--Objetivo: Listar todas OS ALUNOS da base, e junto, mostrar quem está com empréstimo em aberto (se houver).
+--Comandos Utilizados: LEFT JOIN,SELECT,FROM
+SELECT P.nome, R.situacao
+FROM Aluno A
+LEFT JOIN Pessoa P ON P.id = A.id_aluno
+LEFT JOIN RealizaEmprestimo R
+  ON P.id = R.id_aluno AND R.situacao = 'Em aberto';
 
+--Objetivo:listar os exemplares cujo estado esteja bom ou ótimo
+--Comandos Utilizados: JOIN,SELECT,FROM,WHERE,IN,GROUP BY
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+SELECT L.titulo
+FROM Livro L
+JOIN Exemplar E ON L.isbn = E.isbn
+WHERE E.estado_conservacao IN ('Bom','Ótimo');
+GROUP BY L.titulo
 
 
 /* 20. Subconsulta com All -consulta que lista todos os livros cujo ano de publicação é maior que o ano de publicação de todos os livros da categoria 'Engenharia de Software'*/
