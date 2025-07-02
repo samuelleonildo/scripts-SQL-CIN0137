@@ -269,5 +269,5 @@ WHERE
 /* 26. GRANT --concede permissões de SELECT, INSERT e UPDATE na tabela Livro ao usuário usuario_leitor */
 GRANT SELECT, INSERT, UPDATE ON Livro TO usuario_leitor;
 
-/* 27. REVOKE-- revoga as permissões de INSERT e UPDATE na tabela Livro do usuário usuario_leitor */
+/* 26 REVOKE-- revoga as permissões de INSERT e UPDATE na tabela Livro do usuário usuario_leitor */
 REVOKE INSERT, UPDATE ON Livro FROM usuario_leitor;
