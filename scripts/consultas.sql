@@ -1,16 +1,14 @@
-
-/* 1. Vamos adicionar uma coluna 'data_desativacao' à tabela Aluno. */
+-- Comandos utilizados: ALTER TABLE
+-- Objetivo: Adicionar uma coluna 'data_desativacao' à tabela Aluno.
 ALTER TABLE Aluno ADD data_desativacao DATE;
 
 
-/*
-    2. Criar um índice na coluna 'titulo' da tabela 'Livro' para acelerar
-    as consultas de livros pelo título.
-*/
+-- Comandos utilizados: CREATE INDEX
+-- Objetivo: Criar um índice na coluna 'titulo' da tabela 'Livro' para acelerar as consultas de livros pelo título.
 CREATE INDEX idx_livro_titulo ON Livro(titulo);
 
-
-/* 3. povoando mais uma pessoa */
+-- Comandos utilizados: INSERT INTO
+-- Objetivo: Adicionar mais um aluno, Sofia Oliveira, com seus respectivos dados e matrícula.
 INSERT INTO Pessoa (id, nome, email, cpf, rua, numero, bairro, cep_end)
 VALUES (seq_pessoa.NEXTVAL, 'Sofia Oliveira', 'sofia.o@email.com', '15975385245', 'Rua das Flores', '500', 'Graças', '50000000');
 
@@ -23,8 +21,8 @@ VALUES (14, '2026006');
 INSERT INTO Matricula (matricula, curso, semestre)
 VALUES ('2026006', 'Design Gráfico', 1);
 
-
-/* 4. Multando quem está em atraso com uma multa de R$ 1,50 por dia */
+-- Comandos utilizados: UPDATE SET E WHERE
+-- Objetivo: Multar quem está em atraso com uma multa de R$ 1,50 por dia.
 UPDATE RealizaEmprestimo
 SET
     situacao = 'Em atraso',
@@ -36,18 +34,18 @@ WHERE
     situacao = 'Em aberto' AND data_prevista < SYSDATE;
 
 
-/* 5. Anonimizando as avaliações do funcionário 7;
-    passando as responsabilidades dos empréstimos e supervisão para o funcionario 6;
-    demitindo o funcionário 7 em seguida */
+-- Comandos utilizados: UPDATE SET, WHERE E DELETE FROM
+-- Objetivo: 
+--         - Anonimizar as avaliações do funcionário 7;
+--         - Passar as responsabilidades dos empréstimos e supervisão para o funcionario 6;
+--         - E por fim, demitir o funcionário 7.
 UPDATE Avaliacao SET id_funcionario_revisor = NULL WHERE id_funcionario_revisor = 7;
 UPDATE RealizaEmprestimo SET id_funcionario = 6 WHERE id_funcionario = 7;
 UPDATE Funcionario SET id_supervisor = 6 WHERE id_supervisor = 7;
 DELETE FROM Funcionario WHERE id_funcionario = 7;
 
-/*
-    6. Localizar o nome e o e-mail de todos os alunos
-     que possuem empréstimos com situação 'Em atraso'.
-*/
+-- Comandos utilizados: SELECT-FROM-WHERE
+-- Objetivo: Localizar o nome e o e-mail de todos os alunos que possuem empréstimos com situação 'Em atraso'.
 SELECT
     p.nome,
     p.email,
@@ -59,11 +57,9 @@ JOIN RealizaEmprestimo re ON a.id_aluno = re.id_aluno
 JOIN Livro l ON re.isbn = l.isbn
 WHERE re.situacao = 'Em atraso';
 
+-- Comandos utilizados: SELECT-FROM-WHERE, BEETWEEN E ORDER BY
+-- Objetivo: Essa consulta deve listar todos os funcionários que foram admitidos durante o ano de 2023.
 
-/*
-    7. consultar lista todos os funcionários que foram admitidos
-    durante o ano de 2023
-*/
 SELECT
     p.nome,
     f.cargo,
@@ -72,9 +68,9 @@ FROM Funcionario f
 JOIN Pessoa p ON f.id_funcionario = p.id
 WHERE f.data_admissao BETWEEN DATE '2023-01-01' AND DATE '2023-12-31'
 ORDER BY f.data_admissao;
-
-
-/* 8. buscar todos os alunos matriculados em cursos específicos da área de tecnologia */
+ 
+-- Comandos utilizados: SELECT-FROM-WHERE, JOIN, ORDER BY E IN
+-- Objetivo: Essa consulta deve mostrar todos os alunos matriculados em cursos específicos da área de tecnologia.
 SELECT
     p.nome AS nome_aluno,
     m.curso
@@ -84,8 +80,9 @@ JOIN Matricula m ON a.matricula = m.matricula
 WHERE m.curso IN ('Engenharia de Software', 'Ciência da Computação', 'Sistemas de Informação')
 ORDER BY m.curso, p.nome;
 
-
-/* 9. Encontrando qualquer autor cujo nome contenha 'Robert' ou 'Carlos' */
+-- Comandos utilizados: SELECT-FROM-WHERE, JOIN, ORDER BY E LIKE
+-- Objetivo: Essa consulta deve buscar qualquer autor cujo nome contenha 'Robert' ou 'Carlos' 
+--          (precisaremos disso futuramente para nosso sistema de busca).
 SELECT
     al.autor,
     l.titulo AS livro
@@ -95,10 +92,9 @@ WHERE al.autor LIKE '%Robert%' OR al.autor LIKE '%Carlos%'
 ORDER BY al.autor;
 
 
-/*
-    10. Busca todos os funcionários que não possuem supervisor
-    (ou seja, os líderes)
-*/
+-- Comandos utilizados: SELECT-FROM-WHERE, JOIN E IS NULL
+-- Objetivo: Essa busca deve retornar todos os funcionários que não possuem supervisor
+--          (Justificativa: Quando precisarmos saber quem são os líderes).
 SELECT
     p.nome,
     f.cargo,
@@ -107,10 +103,8 @@ FROM Pessoa p
 JOIN Funcionario f ON p.id = f.id_funcionario
 WHERE f.id_supervisor IS NULL;
 
-/*
-    11. listar todos os exemplares de livros que estão
-    atualmente disponíveis para empréstimo
-*/
+-- Comandos utilizados: SELECT-FROM-WHERE, INNER JOIN E ORDER BY
+-- Objetivo: Essa busca deve retornar a lista de todos os exemplares de livros que estão atualmente disponíveis para empréstimo
 SELECT
     l.titulo AS "Título",
     l.editora AS "Editora",
