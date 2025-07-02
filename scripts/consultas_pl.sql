@@ -1,3 +1,169 @@
+-- Comandos utilizados: RECORD
+-- Objetivo: Buscar nome curso e data do último empréstimo de um aluno (o com id = 1)
+
+DECLARE
+    TYPE AlunoRecord IS RECORD (
+        nome                   Pessoa.nome%TYPE,
+        curso                  Matricula.curso%TYPE,
+        data_ultimo_emprestimo RealizaEmprestimo.data_emprestimo%TYPE
+    );
+    v_info AlunoRecord;
+BEGIN
+    SELECT p.nome,
+           m.curso,
+           MAX(e.data_emprestimo)
+      INTO v_info.nome,
+           v_info.curso,
+           v_info.data_ultimo_emprestimo
+    FROM Aluno a
+    JOIN Pessoa p
+      ON p.id = a.id_aluno
+    JOIN Matricula m
+      ON m.matricula = a.matricula
+    LEFT JOIN RealizaEmprestimo e
+      ON e.id_aluno = a.id_aluno
+    WHERE a.id_aluno = 1
+    GROUP BY p.nome, m.curso;
+
+    DBMS_OUTPUT.PUT_LINE(
+      'Nome: ' || v_info.nome ||
+      ' | Curso: ' || v_info.curso ||
+      ' | Último Empréstimo: ' || 
+      TO_CHAR(v_info.data_ultimo_emprestimo, 'DD/MM/YYYY HH24:MI:SS')
+    );
+END;
+/
+
+-- Comandos utilizados: ESTRUTURA DE DADOS DO TIPO TABLE
+-- Objetivo: Criar uma collection com os nomes dos alunos que tem multa pendente
+
+DECLARE
+    TYPE AlunoMultado IS TABLE OF VARCHAR2(100) INDEX BY PLS_INTEGER;
+    v_multados AlunoMultado;
+    idx PLS_INTEGER := 0;
+BEGIN
+    FOR rec IN (
+        SELECT DISTINCT p.nome
+          FROM RealizaEmprestimo re
+          JOIN Aluno a
+            ON a.id_aluno = re.id_aluno
+          JOIN Pessoa p
+            ON p.id = a.id_aluno
+         WHERE re.status_multa = 'Pendente'
+    ) LOOP
+        idx := idx + 1;
+        v_multados(idx) := rec.nome;
+    END LOOP;
+
+    IF v_multados.COUNT = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Nenhum aluno com multa pendente.');
+    ELSE
+        FOR i IN 1..v_multados.COUNT LOOP
+            DBMS_OUTPUT.PUT_LINE('Aluno com multa pendente: ' || v_multados(i));
+        END LOOP;
+    END IF;
+END;
+/
+
+-- Comandos utilizados: BLOCO ANÔNIMO
+-- Objetivo: Verificar se a nota mais recente de avaliação de um exemplar está abaixo de 7
+
+DECLARE
+    v_nota Avaliacao.nota%TYPE;
+    v_data Avaliacao.data_avaliacao%TYPE;
+BEGIN
+    SELECT nota, data_avaliacao
+      INTO v_nota, v_data
+      FROM (
+            SELECT nota, data_avaliacao
+              FROM Avaliacao
+             WHERE isbn = '9780134310884'
+               AND numero_patrimonio = 102
+             ORDER BY data_avaliacao DESC
+           )
+     WHERE ROWNUM = 1;
+
+    IF v_nota < 7 THEN
+        DBMS_OUTPUT.PUT_LINE(
+          'Atenção! Nota ' || v_nota ||
+          ' registrada em ' || TO_CHAR(v_data, 'DD/MM/YYYY')
+        );
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Nota aceitável: ' || v_nota);
+    END IF;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Nenhuma avaliação encontrada para esse exemplar.');
+END;
+/
+
+-- Comandos utilizados: CREATE PROCEDURE
+-- Objetivo: Aplicar multa de 10$ a todos os empréstimos atrasados e não devolvidos
+
+CREATE OR REPLACE PROCEDURE aplicar_multas IS
+    v_rows_updated PLS_INTEGER;
+BEGIN
+    UPDATE RealizaEmprestimo
+       SET valor_multa          = 10,
+           motivo_multa         = 'Atraso na devolução',
+           data_aplicacao_multa = SYSDATE,
+           status_multa         = 'Pendente'
+     WHERE data_prevista < TRUNC(SYSDATE)
+       AND data_devolucao IS NULL
+       AND valor_multa IS NULL
+    RETURNING COUNT(*) INTO v_rows_updated;
+
+    DBMS_OUTPUT.PUT_LINE(v_rows_updated || ' empréstimos atualizados com multa.');
+END aplicar_multas;
+/
+
+-- Comandos utilizados: CREATE FUNCTION
+-- Objetivo: Retornar a média das notas dadas por um funcionário nas avaliações
+
+CREATE OR REPLACE FUNCTION media_notas_funcionario (
+    p_func_id IN Funcionario.id_funcionario%TYPE
+) RETURN NUMBER IS
+    v_media NUMBER;
+BEGIN
+    SELECT AVG(nota)
+      INTO v_media
+      FROM Avaliacao
+     WHERE id_funcionario_revisor = p_func_id;
+
+    RETURN NVL(v_media, 0);
+END media_notas_funcionario;
+/
+
+-- Comandos utilizados: %TYPE
+-- Objetivo: Exibir informaçes detalhadas de um aluno com consistencia de tipos usando %TYPE
+
+DECLARE
+    v_id_pessoa   Pessoa.id%TYPE;
+    v_nome        Pessoa.nome%TYPE;
+    v_email       Pessoa.email%TYPE;
+    v_curso       Matricula.curso%TYPE;
+    v_semestre    Matricula.semestre%TYPE;
+BEGIN
+    SELECT p.id, p.nome, p.email, m.curso, m.semestre
+      INTO v_id_pessoa, v_nome, v_email, v_curso, v_semestre
+      FROM Pessoa p
+      JOIN Aluno a
+        ON p.id = a.id_aluno
+      JOIN Matricula m
+        ON a.matricula = m.matricula
+     WHERE p.id = 2;
+
+    DBMS_OUTPUT.PUT_LINE(
+      'ID: ' || v_id_pessoa ||
+      ' | Nome: ' || v_nome ||
+      ' | Email: ' || v_email ||
+      ' | Curso: ' || v_curso ||
+      ' | Semestre: ' || v_semestre
+    );
+END;
+/
+
+
 -- Comando utilizados: %ROWTYPE
 -- Objetivo: A consulta deve reportar todas as avaliações com notas maior que 7
 DECLARE
