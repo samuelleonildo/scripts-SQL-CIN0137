@@ -124,3 +124,150 @@ WHERE
     e.disponivel = 'S'
 ORDER BY
     l.titulo;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 20. Subconsulta com All -consulta que lista todos os livros cujo ano de publicação é maior que o ano de publicação de todos os livros da categoria 'Engenharia de Software'*/
+SELECT
+    titulo,
+    ano_publicacao,
+    categoria
+FROM
+    Livro
+WHERE
+    ano_publicacao > ALL (SELECT ano_publicacao FROM Livro WHERE categoria = 'Engenharia de Software')
+ORDER BY
+    ano_publicacao DESC;
+
+
+
+/* 21. ORDER BY - consulta que lista todos os alunos em ordem alfabética de nome, e para alunos com o mesmo nome, ordena pelo curso em ordem alfabética.*/
+SELECT
+    p.nome AS nome_aluno,
+    m.curso,
+    m.semestre
+FROM
+    Pessoa p
+JOIN
+    Aluno a ON p.id = a.id_aluno
+JOIN
+    Matricula m ON a.matricula = m.matricula
+ORDER BY
+    p.nome ASC, m.curso ASC;
+
+
+
+/* 22. GROUP BY- consulta que agrupa os empréstimos por aluno e exibe a quantidade total de empréstimos realizados por eles*/
+SELECT
+    a.id_aluno,
+    p.nome AS nome_aluno,
+    COUNT(re.isbn) AS total_emprestimos_realizados
+FROM
+    Aluno a
+JOIN
+    Pessoa p ON a.id_aluno = p.id
+LEFT JOIN
+    RealizaEmprestimo re ON a.id_aluno = re.id_aluno
+GROUP BY
+    a.id_aluno, p.nome
+ORDER BY
+    total_emprestimos_realizados DESC;
+
+/* 23. Having - consulta que lista as categorias de livros que possuem uma média de nota de avaliação superior a 8.5.*/
+SELECT
+    l.categoria,
+    AVG(a.nota) AS media_nota_avaliacao
+FROM
+    Livro l
+JOIN
+    Exemplar e ON l.isbn = e.isbn
+JOIN
+    Avaliacao a ON e.isbn = a.isbn AND e.numero_patrimonio = a.numero_patrimonio
+GROUP BY
+    l.categoria
+HAVING
+    AVG(a.nota) > 8.5
+ORDER BY
+    media_nota_avaliacao DESC;
+
+/* 24. MINUS - consulta que lista as pessoas que são apenas alunos e não estão registradas como funcionários.*/
+SELECT
+    p.nome AS nome_completo,
+    p.email
+FROM
+    Pessoa p
+JOIN
+    Aluno a ON p.id = a.id_aluno
+MINUS
+SELECT
+    p.nome AS nome_completo,
+    p.email
+FROM
+    Pessoa p
+JOIN
+    Funcionario f ON p.id = f.id_funcionario;
+
+
+
+/* 25.CREATE VIEW - esta view cria uma tabela virtual que exibe informações detalhadas sobre empréstimos em atraso*/
+CREATE VIEW Emprestimos_Em_Atraso_View AS
+SELECT
+    p.nome AS nome_aluno,
+    p.email AS email_aluno,
+    l.titulo AS titulo_livro,
+    re.data_emprestimo,
+    re.data_prevista,
+    re.valor_multa,
+    re.motivo_multa
+FROM
+    RealizaEmprestimo re
+JOIN
+    Aluno a ON re.id_aluno = a.id_aluno
+JOIN
+    Pessoa p ON a.id_aluno = p.id
+JOIN
+    Livro l ON re.isbn = l.isbn
+WHERE
+    re.situacao = 'Em atraso';
+
+-
+
+
+
+/* 26. GRANT --concede permissões de SELECT, INSERT e UPDATE na tabela Livro ao usuário usuario_leitor */
+GRANT SELECT, INSERT, UPDATE ON Livro TO usuario_leitor;
+
+/* 27. REVOKE-- revoga as permissões de INSERT e UPDATE na tabela Livro do usuário usuario_leitor */
+REVOKE INSERT, UPDATE ON Livro FROM usuario_leitor;
