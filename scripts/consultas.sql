@@ -172,14 +172,16 @@ LEFT JOIN Pessoa P ON P.id = A.id_aluno
 LEFT JOIN RealizaEmprestimo R
   ON P.id = R.id_aluno AND R.situacao = 'Em aberto';
 
---Objetivo:listar os exemplares cujo estado esteja bom ou ótimo
---Comandos Utilizados: JOIN,SELECT,FROM,WHERE,IN,GROUP BY
-
-SELECT L.titulo
-FROM Livro L
-JOIN Exemplar E ON L.isbn = E.isbn
-WHERE E.estado_conservacao IN ('Bom','Ótimo');
-GROUP BY L.titulo
+--Objetivo: listar só alunos com empréstimo em aberto
+--Comandos Utilizados: SELECT,FROM,WHERE,IN
+SELECT P.nome
+FROM Aluno A
+JOIN Pessoa P ON A.id_aluno = P.id
+WHERE A.id_aluno IN (
+    SELECT id_aluno
+    FROM RealizaEmprestimo
+    WHERE situacao = 'Em aberto'
+);
 
 
 /* 20. Subconsulta com All -consulta que lista todos os livros cujo ano de publicação é maior que o ano de publicação de todos os livros da categoria 'Engenharia de Software'*/
