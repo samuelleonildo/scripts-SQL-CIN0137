@@ -11,9 +11,24 @@ BEGIN
 
 END;
 
---Comando utikizado: IF ELSE
---
-
+--Comando utikizado: %ROWTYPE, CASE WHEN, FOR LOOP
+--Objetivos: A consulta deve analisar o estado de conservação dos exemplares e exibir apenas aqueles que estjam disponeiveis tanto o isbn como o seu estado
+DECLARE
+    v_exemplares Exemplares%ROWTYPE;
+BEGIN
+    SELECT  *INTO v_exemplares FROM Exemplares WHERE disponivel = 'S';
+    FOR i IN (SELECT v_exemplares.isbn) LOOP
+        BEGIN
+            CASE 
+                WHEN v_exemplares.estado_conservacao = 'Ótimo' THEN
+                 DBMS_OUTPUT.PUT_LINE(v_exeomplares.isbn ||'Esta em ótimo estado');
+                WHEN v_exemplares.estado_conservacao = 'Bom' THEN
+                 DBMS_OUTPUT.PUT_LINE(v_exeomplares.isbn ||'Tem boa qualidade');
+                WHEN v_exemplares.estado_conservacao = 'Regular' THEN
+                 DBMS_OUTPUT.PUT_LINE(v_exeomplares.isbn ||'É utilizavel');
+            END CASE;
+    END LOOP;
+END;
 
 ------------------------------------------------------------
 
