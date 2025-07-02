@@ -176,9 +176,9 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('Nota: ' || v_ava.nota);
 
 END;
-
---Comando utikizado: %ROWTYPE, CASE WHEN, FOR LOOP
---Objetivos: A consulta deve analisar o estado de conservação dos exemplares e exibir apenas aqueles que estjam disponeiveis tanto o isbn como o seu estado
+/
+--Comando utilizado: %ROWTYPE, CASE WHEN, FOR LOOP
+--Objetivos: A consulta deve analisar o estado de conservação dos exemplares e exibir apenas aqueles que estejam disponiveis tanto o isbn como o seu estado
 DECLARE
     v_exemplares Exemplares%ROWTYPE;
 BEGIN
@@ -195,7 +195,66 @@ BEGIN
             END CASE;
     END LOOP;
 END;
+/
+    
+--Comandos utilizados: IF ELSEIF, LOOP EXIT
+--Objetivos: Retorna quantos números cadastrados cada pessoa possui
+DECLARE
+    
+    CURSOR c_pessoas IS
+        SELECT id, nome FROM Pessoa;
 
+   
+    v_id Pessoa.id%TYPE;
+    v_nome Pessoa.nome%TYPE;
+    v_qtd_telefones NUMBER;
+BEGIN
+    OPEN c_pessoas;
+    
+    LOOP
+        FETCH c_pessoas INTO v_id, v_nome;
+        EXIT WHEN c_pessoas%NOTFOUND;
+
+        SELECT COUNT(*) INTO v_qtd_telefones
+        FROM Telefone
+        WHERE id_pessoa = v_id;
+
+        IF v_qtd_telefones = 0 THEN
+            DBMS_OUTPUT.PUT_LINE('Pessoa "' || v_nome || '" não possui telefone cadastrado.');
+        ELSIF v_qtd_telefones = 1 THEN
+            DBMS_OUTPUT.PUT_LINE('Pessoa "' || v_nome || '" possui 1 telefone cadastrado.');
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Pessoa "' || v_nome || '" possui ' || v_qtd_telefones || ' telefones cadastrados.');
+        END IF;
+    END LOOP;
+
+    CLOSE c_pessoas;
+END;
+/
+    
+--Comando utilizado: WHILE LOOP 
+--Objetivo: Retorna o número de avaliações que cada funcionario revisou
+DECLARE
+    v_id_func NUMBER := 5;  
+    v_qtd_avaliacoes NUMBER;
+    v_nome_funcionario Pessoa.nome%TYPE;
+BEGIN
+    WHILE v_id_func <= 13 LOOP
+       
+        SELECT nome INTO v_nome_funcionario
+        FROM Pessoa
+        WHERE id = v_id_func;
+
+        SELECT COUNT(*) INTO v_qtd_avaliacoes
+        FROM Avaliacao
+        WHERE id_funcionario_revisor = v_id_func;
+
+        DBMS_OUTPUT.PUT_LINE('Funcionário "' || v_nome_funcionario || '" revisou ' || v_qtd_avaliacoes || ' avaliações.');
+
+        v_id_func := v_id_func + 1;
+    END LOOP;
+END;
+/
 ------------------------------------------------------------
 
 -- 14. CURSOR
