@@ -2,10 +2,13 @@
 -- Objetivo: Adicionar uma coluna 'data_desativacao' à tabela Aluno.
 ALTER TABLE Aluno ADD data_desativacao DATE;
 
+------------------------------------------------------------
 
 -- Comandos utilizados: CREATE INDEX
 -- Objetivo: Criar um índice na coluna 'titulo' da tabela 'Livro' para acelerar as consultas de livros pelo título.
 CREATE INDEX idx_livro_titulo ON Livro(titulo);
+
+------------------------------------------------------------
 
 -- Comandos utilizados: INSERT INTO
 -- Objetivo: Adicionar mais um aluno, Sofia Oliveira, com seus respectivos dados e matrícula.
@@ -21,6 +24,8 @@ VALUES (14, '2026006');
 INSERT INTO Matricula (matricula, curso, semestre)
 VALUES ('2026006', 'Design Gráfico', 1);
 
+------------------------------------------------------------
+
 -- Comandos utilizados: UPDATE SET E WHERE
 -- Objetivo: Multar quem está em atraso com uma multa de R$ 1,50 por dia.
 UPDATE RealizaEmprestimo
@@ -33,6 +38,7 @@ SET
 WHERE
     situacao = 'Em aberto' AND data_prevista < SYSDATE;
 
+------------------------------------------------------------
 
 -- Comandos utilizados: UPDATE SET, WHERE E DELETE FROM
 -- Objetivo: 
@@ -43,6 +49,8 @@ UPDATE Avaliacao SET id_funcionario_revisor = NULL WHERE id_funcionario_revisor 
 UPDATE RealizaEmprestimo SET id_funcionario = 6 WHERE id_funcionario = 7;
 UPDATE Funcionario SET id_supervisor = 6 WHERE id_supervisor = 7;
 DELETE FROM Funcionario WHERE id_funcionario = 7;
+
+------------------------------------------------------------
 
 -- Comandos utilizados: SELECT-FROM-WHERE
 -- Objetivo: Localizar o nome e o e-mail de todos os alunos que possuem empréstimos com situação 'Em atraso'.
@@ -57,6 +65,8 @@ JOIN RealizaEmprestimo re ON a.id_aluno = re.id_aluno
 JOIN Livro l ON re.isbn = l.isbn
 WHERE re.situacao = 'Em atraso';
 
+------------------------------------------------------------
+
 -- Comandos utilizados: SELECT-FROM-WHERE, BEETWEEN E ORDER BY
 -- Objetivo: Essa consulta deve listar todos os funcionários que foram admitidos durante o ano de 2023.
 
@@ -69,6 +79,8 @@ JOIN Pessoa p ON f.id_funcionario = p.id
 WHERE f.data_admissao BETWEEN DATE '2023-01-01' AND DATE '2023-12-31'
 ORDER BY f.data_admissao;
  
+------------------------------------------------------------
+
 -- Comandos utilizados: SELECT-FROM-WHERE, JOIN, ORDER BY E IN
 -- Objetivo: Essa consulta deve mostrar todos os alunos matriculados em cursos específicos da área de tecnologia.
 SELECT
@@ -79,6 +91,8 @@ JOIN Aluno a ON p.id = a.id_aluno
 JOIN Matricula m ON a.matricula = m.matricula
 WHERE m.curso IN ('Engenharia de Software', 'Ciência da Computação', 'Sistemas de Informação')
 ORDER BY m.curso, p.nome;
+
+------------------------------------------------------------
 
 -- Comandos utilizados: SELECT-FROM-WHERE, JOIN, ORDER BY E LIKE
 -- Objetivo: Essa consulta deve buscar qualquer autor cujo nome contenha 'Robert' ou 'Carlos' 
@@ -91,6 +105,7 @@ JOIN Livro l ON al.isbn = l.isbn
 WHERE al.autor LIKE '%Robert%' OR al.autor LIKE '%Carlos%'
 ORDER BY al.autor;
 
+------------------------------------------------------------
 
 -- Comandos utilizados: SELECT-FROM-WHERE, JOIN E IS NULL
 -- Objetivo: Essa busca deve retornar todos os funcionários que não possuem supervisor
@@ -102,6 +117,8 @@ SELECT
 FROM Pessoa p
 JOIN Funcionario f ON p.id = f.id_funcionario
 WHERE f.id_supervisor IS NULL;
+
+------------------------------------------------------------
 
 -- Comandos utilizados: SELECT-FROM-WHERE, INNER JOIN E ORDER BY
 -- Objetivo: Essa busca deve retornar a lista de todos os exemplares de livros que estão atualmente disponíveis para empréstimo
@@ -118,6 +135,8 @@ WHERE
     e.disponivel = 'S'
 ORDER BY
     l.titulo;
+
+------------------------------------------------------------
 
 --OBJETIVO: Listar o nome do funcionário que mais aplicou multas aos alunos.
 --Comandos Usados: SELECT,FROM,JOIN,HAVING,COUNT,MAX,GROUP BY,
@@ -137,6 +156,8 @@ HAVING COUNT(*) = (
     )
 );
 
+------------------------------------------------------------
+
 --Objetivo: encontrar a Média de empréstimos por aluno
 --Comandos Usados: SELECT,FROM,AVG,COUNT,GROUP_BY
 SELECT AVG(qtd_emprestimos) AS media_emprestimos
@@ -147,6 +168,8 @@ FROM (
     GROUP BY A.id_aluno
     );
     
+------------------------------------------------------------
+
 --Objetivo : encontrar a data do primeiro empréstimo realizado na biblioteca
 --Comandos Usados: SELECT,FROM, MIN
 SELECT	MIN(R.data_emprestimo)
@@ -164,6 +187,8 @@ HAVING COUNT(*) > ANY (
   GROUP BY isbn
 );
 
+------------------------------------------------------------
+
 --Objetivo: Listar todas OS ALUNOS da base, e junto, mostrar quem está com empréstimo em aberto (se houver).
 --Comandos Utilizados: LEFT JOIN,SELECT,FROM
 SELECT P.nome, R.situacao
@@ -171,6 +196,8 @@ FROM Aluno A
 LEFT JOIN Pessoa P ON P.id = A.id_aluno
 LEFT JOIN RealizaEmprestimo R
   ON P.id = R.id_aluno AND R.situacao = 'Em aberto';
+
+------------------------------------------------------------
 
 --Objetivo: listar só alunos com empréstimo em aberto
 --Comandos Utilizados: SELECT,FROM,WHERE,IN
@@ -183,8 +210,11 @@ WHERE A.id_aluno IN (
     WHERE situacao = 'Em aberto'
 );
 
+------------------------------------------------------------
 
-/* 20. Subconsulta com All -consulta que lista todos os livros cujo ano de publicação é maior que o ano de publicação de todos os livros da categoria 'Engenharia de Software'*/
+-- 20. SUBCONSULTA COM ALL
+-- Comandos utilizados: SUBCONSULTA COM ALL, SELECT, FROM, WHERE, ORDER BY
+-- Objetivo: Listar todos os livros cujo ano de publicação é maior que o ano de publicação de todos os livros da categoria 'Engenharia de Software'
 SELECT
     titulo,
     ano_publicacao,
@@ -196,9 +226,11 @@ WHERE
 ORDER BY
     ano_publicacao DESC;
 
+------------------------------------------------------------
 
-
-/* 21. ORDER BY - consulta que lista todos os alunos em ordem alfabética de nome, e para alunos com o mesmo nome, ordena pelo curso em ordem alfabética.*/
+-- 21. ORDER BY
+-- Comandos utilizados: SELECT, FROM, JOIN, ORDER BY
+-- Objetivo: Listar todos os alunos em ordem alfabética de nome e, em caso de nomes iguais, ordenar pelo curso
 SELECT
     p.nome AS nome_aluno,
     m.curso,
@@ -212,9 +244,11 @@ JOIN
 ORDER BY
     p.nome ASC, m.curso ASC;
 
+------------------------------------------------------------
 
-
-/* 22. GROUP BY- consulta que agrupa os empréstimos por aluno e exibe a quantidade total de empréstimos realizados por eles*/
+-- 22. GROUP BY
+-- Comandos utilizados: SELECT, FROM, JOIN, LEFT JOIN, GROUP BY, ORDER BY, COUNT
+-- Objetivo: Agrupar os empréstimos por aluno e exibir a quantidade total de empréstimos realizados por cada um
 SELECT
     a.id_aluno,
     p.nome AS nome_aluno,
@@ -230,7 +264,11 @@ GROUP BY
 ORDER BY
     total_emprestimos_realizados DESC;
 
-/* 23. Having - consulta que lista as categorias de livros que possuem uma média de nota de avaliação superior a 8.5.*/
+------------------------------------------------------------
+
+-- 23. HAVING
+-- Comandos utilizados: SELECT, FROM, JOIN, GROUP BY, HAVING, ORDER BY, AVG
+-- Objetivo: Listar as categorias de livros que possuem uma média de nota de avaliação superior a 8.5
 SELECT
     l.categoria,
     AVG(a.nota) AS media_nota_avaliacao
@@ -247,7 +285,11 @@ HAVING
 ORDER BY
     media_nota_avaliacao DESC;
 
-/* 24. MINUS - consulta que lista as pessoas que são apenas alunos e não estão registradas como funcionários.*/
+------------------------------------------------------------
+
+-- 24. MINUS
+-- Comandos utilizados: MINUS, SELECT, FROM, JOIN
+-- Objetivo: Listar as pessoas que são apenas alunos e não estão registradas como funcionários
 SELECT
     p.nome AS nome_completo,
     p.email
@@ -264,9 +306,11 @@ FROM
 JOIN
     Funcionario f ON p.id = f.id_funcionario;
 
+------------------------------------------------------------
 
-
-/* 25.CREATE VIEW - esta view cria uma tabela virtual que exibe informações detalhadas sobre empréstimos em atraso*/
+-- 25. CREATE VIEW
+-- Comandos utilizados: CREATE VIEW, SELECT, FROM, JOIN, WHERE
+-- Objetivo: Criar uma visualização com informações detalhadas sobre os empréstimos em atraso
 CREATE VIEW Emprestimos_Em_Atraso_View AS
 SELECT
     p.nome AS nome_aluno,
@@ -287,12 +331,16 @@ JOIN
 WHERE
     re.situacao = 'Em atraso';
 
--
+------------------------------------------------------------
 
-
-
-/* 26. GRANT --concede permissões de SELECT, INSERT e UPDATE na tabela Livro ao usuário usuario_leitor */
+-- 26. GRANT
+-- Comandos utilizados: GRANT
+-- Objetivo: Conceder permissões de SELECT, INSERT e UPDATE na tabela Livro ao usuário usuario_leitor
 GRANT SELECT, INSERT, UPDATE ON Livro TO usuario_leitor;
 
-/* 26 REVOKE-- revoga as permissões de INSERT e UPDATE na tabela Livro do usuário usuario_leitor */
+------------------------------------------------------------
+
+-- 26. REVOKE
+-- Comandos utilizados: REVOKE
+-- Objetivo: Revogar as permissões de INSERT e UPDATE na tabela Livro do usuário usuario_leitor
 REVOKE INSERT, UPDATE ON Livro FROM usuario_leitor;

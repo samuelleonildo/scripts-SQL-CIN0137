@@ -34,6 +34,8 @@ BEGIN
 END;
 /
 
+------------------------------------------------------------
+
 -- Comandos utilizados: ESTRUTURA DE DADOS DO TIPO TABLE
 -- Objetivo: Criar uma collection com os nomes dos alunos que tem multa pendente
 
@@ -64,6 +66,8 @@ BEGIN
     END IF;
 END;
 /
+
+------------------------------------------------------------
 
 -- Comandos utilizados: BLOCO ANÔNIMO
 -- Objetivo: Verificar se a nota mais recente de avaliação de um exemplar está abaixo de 7
@@ -97,6 +101,8 @@ EXCEPTION
 END;
 /
 
+------------------------------------------------------------
+
 -- Comandos utilizados: CREATE PROCEDURE
 -- Objetivo: Aplicar multa de 10$ a todos os empréstimos atrasados e não devolvidos
 
@@ -117,6 +123,8 @@ BEGIN
 END aplicar_multas;
 /
 
+------------------------------------------------------------
+
 -- Comandos utilizados: CREATE FUNCTION
 -- Objetivo: Retornar a média das notas dadas por um funcionário nas avaliações
 
@@ -133,6 +141,8 @@ BEGIN
     RETURN NVL(v_media, 0);
 END media_notas_funcionario;
 /
+
+------------------------------------------------------------
 
 -- Comandos utilizados: %TYPE
 -- Objetivo: Exibir informaçes detalhadas de um aluno com consistencia de tipos usando %TYPE
@@ -163,6 +173,7 @@ BEGIN
 END;
 /
 
+------------------------------------------------------------
 
 -- Comando utilizados: %ROWTYPE
 -- Objetivo: A consulta deve reportar todas as avaliações com notas maior que 7
@@ -177,6 +188,9 @@ BEGIN
 
 END;
 /
+
+------------------------------------------------------------
+
 --Comando utilizado: %ROWTYPE, CASE WHEN, FOR LOOP
 --Objetivos: A consulta deve analisar o estado de conservação dos exemplares e exibir apenas aqueles que estejam disponiveis tanto o isbn como o seu estado
 DECLARE
@@ -196,6 +210,8 @@ BEGIN
     END LOOP;
 END;
 /
+
+------------------------------------------------------------
     
 --Comandos utilizados: IF ELSEIF, LOOP EXIT
 --Objetivos: Retorna quantos números cadastrados cada pessoa possui
@@ -231,6 +247,8 @@ BEGIN
     CLOSE c_pessoas;
 END;
 /
+
+------------------------------------------------------------
     
 --Comando utilizado: WHILE LOOP 
 --Objetivo: Retorna o número de avaliações que cada funcionario revisou
@@ -255,6 +273,7 @@ BEGIN
     END LOOP;
 END;
 /
+
 ------------------------------------------------------------
 
 -- 14. CURSOR
